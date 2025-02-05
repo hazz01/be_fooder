@@ -7,12 +7,20 @@ import { verifyToken, verifyRole } from "../middlewares/authorization"
 const app = express()
 app.use(express.json())
 
-app.get(`/`, [verifyToken, verifyRole(["MANAGER"])], getAllUsers)
-app.get(`/profile`, [verifyToken, verifyRole(["CASHIER", "MANAGER"])], getUserById)
-app.post(`/`, [verifyToken, verifyRole(["MANAGER"]), uploadFile.single("picture"), verifyAddUser], createUser)
-app.put(`/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture"), verifyEditUser], updateUser)
-app.put(`/profile/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture")], changePicture)
-app.delete(`/:id`, [verifyToken, verifyRole(["MANAGER"])], deleteUser)
+// app.get(`/`, [verifyToken, verifyRole(["MANAGER"])], getAllUsers)
+// app.get(`/profile`, [verifyToken, verifyRole(["CASHIER", "MANAGER"])], getUserById)
+// app.post(`/`, [verifyToken, verifyRole(["MANAGER"]), uploadFile.single("picture"), verifyAddUser], createUser)
+// app.put(`/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture"), verifyEditUser], updateUser)
+// app.put(`/profile/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture")], changePicture)
+// app.delete(`/:id`, [verifyToken, verifyRole(["MANAGER"])], deleteUser)
+// app.post(`/login`, [verifyAuthentication], authentication)
+
+app.get(`/`, [verifyRole(["MANAGER"])], getAllUsers)
+app.get(`/profile`, [verifyRole(["CASHIER", "MANAGER"])], getUserById)
+app.post(`/register`, [uploadFile.single("picture"), verifyAddUser], createUser)
+app.put(`/:id`, [verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture"), verifyEditUser], updateUser)
+app.put(`/profile/:id`, [verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture")], changePicture)
+app.delete(`/:id`, [verifyRole(["MANAGER"])], deleteUser)
 app.post(`/login`, [verifyAuthentication], authentication)
 
 export default app
@@ -158,7 +166,7 @@ export default app
  *        description: The user was not found
  *      500:
  *        description: Some error happened
- *   delete:
+ *   delete:   
  *     summary: Remove the user by id
  *     tags: [Users]
  *     parameters:
