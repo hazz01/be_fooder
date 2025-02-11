@@ -1,87 +1,47 @@
-import { PrismaClient, Role, Category, Payment, Status, User, Menu, Order } from '@prisma/client'
-import 'ts-node/register'
-import { v4 as uuidv4 } from 'uuid'
-import process from 'process'
+import { PrismaClient, Role, Category, Payment, Status } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 // Initialize Prisma Client
-const prisma = new PrismaClient()
-
-// Interface for creating a user
-interface CreateUserInput {
-  name: string
-  email: string
-  password: string
-  profile_picture: string
-  role: Role
-}
-
-// Interface for creating a menu item
-interface CreateMenuInput {
-  name: string
-  price: number
-  category: Category
-  picture: string
-  description: string
-}
-
-// Interface for creating an order list item
-interface OrderListInput {
-  quantity: number
-  note: string
-  menuId: number
-}
-
-// Interface for creating an order
-interface CreateOrderInput {
-  customer: string
-  table_number: string
-  total_price: number
-  payment_method: Payment
-  status: Status
-  userId: number
-  orderLists: {
-    create: OrderListInput[]
-  }
-}
+const prisma = new PrismaClient();
 
 // Function to create a user
-async function createUser(data: CreateUserInput): Promise<User> {
+async function createUser(data) {
   return await prisma.user.create({
     data: {
       uuid: uuidv4(),
       ...data
     }
-  })
+  });
 }
 
 // Function to create a menu item
-async function createMenuItem(data: CreateMenuInput): Promise<Menu> {
+async function createMenuItem(data) {
   return await prisma.menu.create({
     data: {
       uuid: uuidv4(),
       ...data
     }
-  })
+  });
 }
 
 // Function to create an order
-async function createOrder(data: CreateOrderInput): Promise<Order> {
+async function createOrder(data) {
   return await prisma.order.create({
     data: {
       uuid: uuidv4(),
       ...data
     }
-  })
+  });
 }
 
 // Main seeding function
-async function main(): Promise<void> {
+async function main() {
   try {
     // Clean existing data
-    await prisma.orderList.deleteMany({})
-    await prisma.order.deleteMany({})
-    await prisma.menu.deleteMany({})
-    await prisma.user.deleteMany({})
+    await prisma.orderList.deleteMany({});
+    await prisma.order.deleteMany({});
+    await prisma.menu.deleteMany({});
+    await prisma.user.deleteMany({});
 
     // Create Users
     const manager = await createUser({
@@ -90,7 +50,7 @@ async function main(): Promise<void> {
       password: 'hashedpassword123',
       profile_picture: 'manager.jpg',
       role: Role.MANAGER
-    })
+    });
 
     const cashier = await createUser({
       name: 'Alice Cashier',
@@ -98,7 +58,7 @@ async function main(): Promise<void> {
       password: 'hashedpassword456',
       profile_picture: 'cashier.jpg',
       role: Role.CASHIER
-    })
+    });
 
     // Create Menu Items
     const nasiGoreng = await createMenuItem({
@@ -107,7 +67,7 @@ async function main(): Promise<void> {
       category: Category.FOOD,
       picture: 'nasi-goreng.jpg',
       description: 'Indonesian fried rice with chicken and vegetables'
-    })
+    });
 
     const iceTea = await createMenuItem({
       name: 'Ice Tea',
@@ -115,7 +75,7 @@ async function main(): Promise<void> {
       category: Category.DRINK,
       picture: 'ice-tea.jpg',
       description: 'Refreshing cold tea with ice'
-    })
+    });
 
     const frenchFries = await createMenuItem({
       name: 'French Fries',
@@ -123,7 +83,7 @@ async function main(): Promise<void> {
       category: Category.SNACK,
       picture: 'french-fries.jpg',
       description: 'Crispy potato fries with salt'
-    })
+    });
 
     // Create Orders
     await createOrder({
@@ -147,7 +107,7 @@ async function main(): Promise<void> {
           }
         ]
       }
-    })
+    });
 
     await createOrder({
       customer: 'Table 2 Customer',
@@ -170,21 +130,19 @@ async function main(): Promise<void> {
           }
         ]
       }
-    })
+    });
 
-    console.log('✅ Seed data created successfully')
+    console.log('✅ Seed data created successfully');
   } catch (error) {
-    console.error('❌ Error seeding data:', error)
-    throw error
+    console.error('❌ Error seeding data:', error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
 // Execute the seed function
-main()
-  .catch((e: Error) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
