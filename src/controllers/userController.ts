@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import md5 from "md5";
 import { sign } from "jsonwebtoken";
 
+
 const prisma = new PrismaClient({ errorFormat: "pretty" })
 
 export const getAllUsers = async (request: Request, response: Response) => {
